@@ -25,6 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetFiltersBtn = document.getElementById('resetFiltersBtn');
   const toast = document.getElementById('toast');
 
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleText = document.getElementById('themeToggleText');
+  const sunIcon = themeToggleBtn ? themeToggleBtn.querySelector('.sun-icon') : null;
+  const moonIcon = themeToggleBtn ? themeToggleBtn.querySelector('.moon-icon') : null;
+
   // --- API Functions ---
 
   async function fetchRandomQuote(category = 'All') {
@@ -308,6 +313,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (exportCsvBtn) {
     exportCsvBtn.addEventListener('click', exportToCsv);
+  }
+
+  // --- Theme Toggling ---
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('wisdom_theme', theme);
+
+    if (theme === 'light') {
+      if (themeToggleText) themeToggleText.textContent = 'Dark Mode';
+      if (sunIcon) sunIcon.classList.remove('hidden');
+      if (moonIcon) moonIcon.classList.add('hidden');
+    } else {
+      if (themeToggleText) themeToggleText.textContent = 'Light Mode';
+      if (sunIcon) sunIcon.classList.add('hidden');
+      if (moonIcon) moonIcon.classList.remove('hidden');
+    }
+  }
+
+  // Initialize theme from localStorage or default to dark
+  const savedTheme = localStorage.getItem('wisdom_theme') || 'dark';
+  setTheme(savedTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
   }
 
   // Global Keyboard Shortcuts
