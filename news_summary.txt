@@ -1,0 +1,19 @@
+# Summary of News (September 6, 2026)
+
+Key takeaways from news.txt:
+
+1. Geopolitics & Conflict:
+   - High-level U.S.-Russia talks in Moscow focused on the Ukraine conflict, but concluded without breakthroughs.
+   - Maritime clashes escalated in the Strait of Hormuz after the U.S. destroyed three Iranian tankers following missile attacks.
+   - The U.S. federal budget was temporarily extended through December 11, 2026.
+
+2. Technology & AI:
+   - Apple entered a new era with John Ternus officially succeeding Tim Cook as CEO.
+   - Tension has emerged between Apple and OpenAI over hardware and circuit patents.
+   - Advancements in AI robotics accelerated with OpenAI's humanoid robot ambitions and Skild's single-video-trained "S1" model.
+   - G20 delegates backed "light-touch" regulation for artificial intelligence.
+
+3. Economy & Markets:
+   - The U.S. labor market remained stable with 162,000 jobs added and 4.1% unemployment.
+   - Gold climbed past $4,200/oz amid heightened global uncertainty and monetary policy anticipation.
+   - The U.K. initiated reforms to cut business reporting overhead by £450M annually.
