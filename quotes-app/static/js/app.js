@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentCategory = 'All';
   let searchQuery = '';
   let currentHeroQuote = null;
+  let displayedQuotes = [];
   let debounceTimer = null;
 
   // DOM Elements
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const galleryTitle = document.getElementById('galleryTitle');
   const galleryCount = document.getElementById('galleryCount');
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
   const quotesGrid = document.getElementById('quotesGrid');
   const emptyState = document.getElementById('emptyState');
   const resetFiltersBtn = document.getElementById('resetFiltersBtn');
@@ -100,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderQuotesGrid(quotes) {
+    displayedQuotes = quotes;
     quotesGrid.innerHTML = '';
 
     const count = quotes.length;
@@ -118,9 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (count === 0) {
       emptyState.classList.remove('hidden');
       quotesGrid.classList.add('hidden');
+      if (exportCsvBtn) exportCsvBtn.disabled = true;
       return;
     }
 
+    if (exportCsvBtn) exportCsvBtn.disabled = false;
     emptyState.classList.add('hidden');
     quotesGrid.classList.remove('hidden');
 
@@ -131,11 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div>
           <div class="card-top">
             <span class="card-category">${escapeHtml(quote.category)}</span>
-            <button class="card-copy-btn" title="Copy quote" aria-label="Copy quote">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="card-copy-btn" title="Copy quote to clipboard" aria-label="Copy quote to clipboard">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
+              <span class="copy-text">Copy</span>
             </button>
           </div>
           <blockquote class="card-quote">“${escapeHtml(quote.quote)}”</blockquote>
@@ -145,9 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Copy individual quote
       const copyBtn = card.querySelector('.card-copy-btn');
+      const copyText = copyBtn.querySelector('.copy-text');
       copyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         copyToClipboard(`"${quote.quote}" — ${quote.author}`);
+        copyBtn.classList.add('copied');
+        copyText.textContent = '✓ Copied';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'Copy';
+        }, 1500);
       });
 
       quotesGrid.appendChild(card);
@@ -256,6 +269,46 @@ document.addEventListener('DOMContentLoaded', () => {
     clearSearchBtn.classList.add('hidden');
     selectCategory('All');
   });
+
+  function exportToCsv() {
+    if (!displayedQuotes || displayedQuotes.length === 0) {
+      showToast('No quotes to export!');
+      return;
+    }
+
+    const headers = ['ID', 'Quote', 'Author', 'Category'];
+    const rows = displayedQuotes.map(q => [
+      q.id,
+      `"${(q.quote || '').replace(/"/g, '""')}"`,
+      `"${(q.author || '').replace(/"/g, '""')}"`,
+      `"${(q.category || '').replace(/"/g, '""')}"`
+    ]);
+
+    // Include UTF-8 BOM for Excel compatibility with special characters
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const safeCat = currentCategory && currentCategory !== 'All' 
+      ? currentCategory.toLowerCase().replace(/[^a-z0-9]/g, '_') 
+      : 'all';
+    const filename = `wisdom_quotes_${safeCat}.csv`;
+
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast(`Exported ${displayedQuotes.length} quotes to ${filename}!`);
+  }
+
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', exportToCsv);
+  }
 
   // Global Keyboard Shortcuts
   document.addEventListener('keydown', (e) => {
