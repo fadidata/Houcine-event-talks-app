@@ -642,6 +642,22 @@ body {
   color: var(--text-muted);
 }
 
+/* Search Keyword Highlighting */
+.search-highlight {
+  background: rgba(99, 102, 241, 0.35);
+  color: #ffffff;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
+}
+
+[data-theme="light"] .search-highlight {
+  background: rgba(99, 102, 241, 0.16);
+  color: #312e81;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;

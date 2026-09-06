@@ -137,6 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
     quotes.forEach(quote => {
       const card = document.createElement('div');
       card.className = 'quote-card';
+
+      const highlightedQuote = highlightMatch(quote.quote, searchQuery);
+      const highlightedAuthor = highlightMatch(quote.author, searchQuery);
+
       card.innerHTML = `
         <div>
           <div class="card-top">
@@ -149,9 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="copy-text">Copy</span>
             </button>
           </div>
-          <blockquote class="card-quote">“${escapeHtml(quote.quote)}”</blockquote>
+          <blockquote class="card-quote">“${highlightedQuote}”</blockquote>
         </div>
-        <cite class="card-author">— ${escapeHtml(quote.author)}</cite>
+        <cite class="card-author">— ${highlightedAuthor}</cite>
       `;
 
       // Copy individual quote
@@ -196,6 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function highlightMatch(text, query) {
+    if (!text) return '';
+    const safeText = escapeHtml(text);
+    const cleanQuery = (query || '').trim();
+    if (!cleanQuery) return safeText;
+
+    const escapedQuery = escapeHtml(cleanQuery);
+    const regex = new RegExp(`(${escapeRegex(escapedQuery)})`, 'gi');
+    return safeText.replace(regex, '<mark class="search-highlight">$1</mark>');
   }
 
   let toastTimeout = null;
